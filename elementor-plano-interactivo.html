@@ -1,378 +1,151 @@
-<div id="kp-plano" class="kp-wrap" aria-label="Plano interactivo de salas">
+<div id="kp-plano" aria-label="Plano interactivo de salas">
   <style>
-    #kp-plano {
-      --txt: #3b3b3b;
-      --txt-soft: #686868;
-      --line: #d9d9d9;
-      --room: #d8d8da;
-      --hot: #eb568a;
-      --hot-soft: #f7d7e4;
-      --panel: #ffffff;
-      --tag-border: #ececec;
-      --shadow: 0 10px 28px rgba(0, 0, 0, 0.10);
-      font-family: Inter, Montserrat, Arial, sans-serif;
-      color: var(--txt);
-      padding: clamp(8px, 1.8vw, 22px);
-      background: transparent;
-    }
+    #kp-plano{--txt:#2f2f2f;--muted:#6f6f6f;--room:#d6d6d8;--hot:#eb568a;--line:#dadada;--card:#fff;--shadow:0 14px 32px rgba(15,15,15,.12);font-family:Inter,Montserrat,Arial,sans-serif;background:transparent;color:var(--txt)}
+    #kp-plano *{box-sizing:border-box}
+    #kp-plano .grid{display:grid;grid-template-columns:minmax(280px,500px) 1fr;gap:clamp(18px,3vw,42px);align-items:start}
+    #kp-plano .title{margin:0 0 10px;color:var(--hot);font-size:clamp(28px,4.2vw,52px);font-weight:800;letter-spacing:.08em}
+    #kp-plano .desc{margin:0 0 22px;max-width:46ch;color:var(--muted);line-height:1.4;font-size:clamp(14px,1.1vw,20px)}
+    #kp-plano .list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:12px 20px}
+    #kp-plano .item{display:flex;gap:12px;align-items:center;cursor:pointer;transition:.2s}
+    #kp-plano .item:hover{transform:translateX(2px)}
+    #kp-plano .num{width:30px;height:30px;border:2px solid #bcbcbc;border-radius:50%;display:grid;place-items:center;background:transparent;color:#7d7d7d;font-size:12px;font-weight:700;transition:.2s}
+    #kp-plano .name{font-size:clamp(16px,1.45vw,31px);font-weight:700;line-height:1.08}
+    #kp-plano .item:hover .num,#kp-plano .item.is-active .num{border-color:var(--hot);color:var(--hot);box-shadow:0 0 0 4px rgba(235,86,138,.16)}
 
-    #kp-plano * { box-sizing: border-box; }
+    #kp-plano .map{position:relative;padding:10px;border:1px solid #ededed;border-radius:14px;background:#fbfbfb;overflow:hidden}
+    #kp-plano svg{width:100%;height:auto;display:block}
+    #kp-plano .outline{fill:none;stroke:var(--line);stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;opacity:.95}
+    #kp-plano .room-target{fill:var(--room)!important;stroke:#f2f2f2;stroke-width:1.1;cursor:pointer;transition:fill .2s ease,opacity .2s ease}
+    #kp-plano svg.has-focus .room-target{opacity:.34}
+    #kp-plano .room-target:hover,#kp-plano .room-target.is-active{fill:var(--hot)!important;opacity:1!important}
+    #kp-plano .marker{fill:#efefef;stroke:#d8d8d8;stroke-width:1.2;transition:.2s}
+    #kp-plano .marker.active{fill:var(--hot);stroke:#fff}
 
-    #kp-plano .kp-grid {
-      display: grid;
-      grid-template-columns: minmax(320px, 500px) minmax(340px, 1fr);
-      gap: clamp(18px, 2.6vw, 40px);
-      align-items: start;
-    }
-
-    #kp-plano .kp-title {
-      margin: 0 0 10px;
-      font-size: clamp(28px, 4vw, 50px);
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      line-height: .95;
-      color: var(--hot);
-      font-weight: 800;
-    }
-
-    #kp-plano .kp-desc {
-      margin: 0 0 24px;
-      color: var(--txt-soft);
-      font-size: clamp(14px, 1.15vw, 20px);
-      line-height: 1.4;
-      max-width: 42ch;
-    }
-
-    #kp-plano .kp-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px 22px;
-    }
-
-    #kp-plano .kp-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      color: var(--txt);
-      transition: transform .2s ease, color .2s ease;
-    }
-
-    #kp-plano .kp-item:hover { transform: translateX(2px); }
-
-    #kp-plano .kp-num {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: 2px solid #bdbdbd;
-      color: #8a8a8a;
-      background: transparent;
-      display: grid;
-      place-items: center;
-      font-size: 12px;
-      font-weight: 700;
-      flex: 0 0 30px;
-      transition: .2s ease;
-    }
-
-    #kp-plano .kp-name {
-      font-size: clamp(16px, 1.5vw, 33px);
-      line-height: 1.08;
-      font-weight: 700;
-      letter-spacing: .01em;
-      transition: .2s ease;
-    }
-
-    #kp-plano .kp-item:hover .kp-num,
-    #kp-plano .kp-item.is-active .kp-num {
-      border-color: var(--hot);
-      color: var(--hot);
-      background: transparent;
-      box-shadow: 0 0 0 4px var(--hot-soft);
-    }
-
-    #kp-plano .kp-item:hover .kp-name,
-    #kp-plano .kp-item.is-active .kp-name {
-      color: #252525;
-    }
-
-    #kp-plano .kp-map {
-      position: relative;
-      border: 1px solid #efefef;
-      border-radius: 14px;
-      padding: clamp(8px, 1.2vw, 14px);
-      background: #fcfcfc;
-      overflow: hidden;
-    }
-
-    #kp-plano svg { width: 100%; height: auto; display: block; }
-
-    #kp-plano .room-target {
-      fill: var(--room) !important;
-      stroke: #f3f3f3;
-      stroke-width: 1.1;
-      cursor: pointer;
-      transition: fill .22s ease, opacity .22s ease, filter .22s ease;
-    }
-
-    #kp-plano svg.has-focus .room-target { opacity: .34; filter: grayscale(.32); }
-
-    #kp-plano .room-target:hover,
-    #kp-plano .room-target.is-active {
-      fill: var(--hot) !important;
-      opacity: 1 !important;
-      filter: none !important;
-    }
-
-    #kp-plano .kp-tag {
-      position: absolute;
-      min-width: 228px;
-      max-width: 270px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--tag-border);
-      background: var(--panel);
-      box-shadow: var(--shadow);
-      display: none;
-      z-index: 20;
-      transform-origin: 20% 50%;
-    }
-
-    #kp-plano .kp-tag.is-open { display: block; animation: kpPop .2s ease-out; }
-
-    #kp-plano .kp-tag::after {
-      content: '';
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background: var(--panel);
-      border: 1px solid var(--tag-border);
-      transform: rotate(45deg);
-    }
-
-    #kp-plano .kp-tag[data-side="right"]::after { left: -7px; top: 20px; border-top: 0; border-right: 0; }
-    #kp-plano .kp-tag[data-side="left"]::after { right: -7px; top: 20px; border-bottom: 0; border-left: 0; }
-    #kp-plano .kp-tag[data-side="bottom"]::after { top: -7px; left: 22px; border-right: 0; border-bottom: 0; }
-    #kp-plano .kp-tag[data-side="top"]::after { bottom: -7px; left: 22px; border-left: 0; border-top: 0; }
-
-    #kp-plano .kp-tag h4 {
-      margin: 0 0 8px;
-      color: #252525;
-      font-size: 13px;
-      line-height: 1.2;
-      font-weight: 700;
-    }
-
-    #kp-plano .kp-metrics { display: flex; gap: 10px; align-items: center; }
-
-    #kp-plano .kp-metric { display: flex; align-items: center; gap: 6px; }
-
-    #kp-plano .kp-wheel { --size: 52px; position: relative; width: var(--size); height: var(--size); }
-    #kp-plano .kp-wheel svg { transform: rotate(-90deg); }
-    #kp-plano .kp-wheel .bg { fill: none; stroke: #ededed; stroke-width: 7; }
-    #kp-plano .kp-wheel .fg {
-      fill: none;
-      stroke: var(--hot);
-      stroke-linecap: round;
-      stroke-width: 7;
-      stroke-dasharray: 0 999;
-      transition: stroke-dasharray .95s cubic-bezier(.2,.7,0,1);
-    }
-    #kp-plano .kp-wheel b {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      color: #333;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    #kp-plano .kp-meta { color: #6b6b6b; font-size: 11px; line-height: 1.1; }
-    #kp-plano .kp-meta strong { display: block; color: #262626; font-size: 12px; margin-bottom: 2px; }
-
-    @keyframes kpPop {
-      from { opacity: 0; transform: translateY(4px) scale(.985); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    @media (max-width: 1100px) {
-      #kp-plano .kp-grid { grid-template-columns: minmax(280px, 430px) 1fr; }
-      #kp-plano .kp-list { grid-template-columns: 1fr; }
-      #kp-plano .kp-map { padding: 10px; }
-    }
-
-    @media (max-width: 820px) {
-      #kp-plano .kp-grid { grid-template-columns: 1fr; gap: 18px; }
-      #kp-plano .kp-title { margin-bottom: 8px; }
-      #kp-plano .kp-list { grid-template-columns: 1fr; gap: 10px; }
-      #kp-plano .kp-tag { min-width: 208px; max-width: 240px; }
-    }
+    #kp-plano .tag{position:absolute;display:none;min-width:230px;max-width:280px;padding:10px 12px;background:var(--card);border:1px solid #ededed;border-radius:12px;box-shadow:var(--shadow);z-index:10}
+    #kp-plano .tag.open{display:block;animation:pop .2s ease}
+    #kp-plano .tag::after{content:'';position:absolute;width:12px;height:12px;background:var(--card);transform:rotate(45deg);border:1px solid #ededed}
+    #kp-plano .tag[data-side='right']::after{left:-7px;top:22px;border-top:0;border-right:0}
+    #kp-plano .tag[data-side='left']::after{right:-7px;top:22px;border-bottom:0;border-left:0}
+    #kp-plano .tag h4{margin:0 0 8px;font-size:13px}
+    #kp-plano .metrics{display:flex;gap:10px}
+    #kp-plano .metric{display:flex;align-items:center;gap:6px}
+    #kp-plano .wheel{position:relative;width:50px;height:50px}
+    #kp-plano .wheel svg{transform:rotate(-90deg)}
+    #kp-plano .wheel .bg{fill:none;stroke:#ececec;stroke-width:7}
+    #kp-plano .wheel .fg{fill:none;stroke:var(--hot);stroke-width:7;stroke-linecap:round;stroke-dasharray:0 999;transition:stroke-dasharray .9s ease}
+    #kp-plano .wheel b{position:absolute;inset:0;display:grid;place-items:center;font-size:11px}
+    #kp-plano .meta{font-size:11px;color:#666}.meta strong{display:block;color:#333;font-size:12px}
+    @keyframes pop{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+    @media (max-width:1100px){#kp-plano .grid{grid-template-columns:minmax(260px,420px) 1fr}#kp-plano .list{grid-template-columns:1fr}}
+    @media (max-width:820px){#kp-plano .grid{grid-template-columns:1fr}#kp-plano .tag{min-width:210px;max-width:235px}}
   </style>
 
-  <div class="kp-grid">
+  <div class="grid">
     <section>
-      <h2 class="kp-title">PLANTA</h2>
-      <p class="kp-desc">La narrativa fluye por ocho salas, recorriendo la historia del arte sacro granadino desde el S. XVI a la actualidad.</p>
-      <ol class="kp-list" id="kp-list"></ol>
+      <h2 class="title">PLANTA</h2>
+      <p class="desc">La narrativa fluye por ocho salas, recorriendo la historia del arte sacro granadino desde el S. XVI a la actualidad.</p>
+      <ol id="kp-list" class="list"></ol>
     </section>
 
-    <section class="kp-map" id="kp-map">
-      <svg id="Capa_2" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470.06 351">
-        <defs><style>.cls-1{fill:#eaeaea}.cls-2{fill:#eb568a}.cls-3{fill:#c7c6c6}</style></defs>
-        <g id="Capa_1-2" data-name="Capa 1">
-          <g><path class="cls-1" d="M329.46,245.41c0-2.86-2.01-5.26-4.7-5.87-.43-.1-.88-.15-1.34-.15-3.33,0-6.04,2.7-6.04,6.02s2.71,6.01,6.04,6.01c.46,0,.91-.05,1.34-.15,2.69-.61,4.7-3.01,4.7-5.86Z"/><path class="cls-1" d="M355.88,215.92c-8.54,6.92-19.35,11.16-31.12,11.54v8.61c4.59.64,8.12,4.58,8.12,9.34s-3.53,8.69-8.12,9.33v32.27c26.53-.38,50.83-9.94,69.81-25.66l-38.69-45.43Z"/></g>
-          <g><path class="cls-1" d="M216.76,245.41c0-2.6,1.05-4.95,2.75-6.65l-34.69-34.55H60.23l-1.62,84.24h168.17v-33.63c-.19.01-.37.02-.56.02-5.22,0-9.46-4.23-9.46-9.43Z"/><path class="cls-1" d="M226.22,239.39c-1.67,0-3.19.68-4.28,1.78-1.09,1.08-1.76,2.58-1.76,4.24,0,3.31,2.7,6.01,6.04,6.01.19,0,.37-.01.56-.03,3.07-.28,5.48-2.86,5.48-5.98,0-3.32-2.71-6.02-6.04-6.02Z"/></g>
-          <g><path class="cls-1" d="M425.2,154.15c0-3.87,2.34-7.2,5.68-8.65-5.08-18.06-14.63-34.28-27.39-47.38-3.07-3.15-6.32-6.12-9.74-8.89h0c-3.79-3.09-7.79-5.92-11.97-8.49-1.36-.83-2.73-1.63-4.12-2.41l-1.92,3.79-17.03,33.68,9.56,8.24.32.27-.27.33c-3.46,4.13-6.92,8.29-10.35,12.44,10.58,9.51,17.24,23.25,17.24,38.54,0,7.26-1.51,14.16-4.21,20.44l53.79,21.87,1.6.65c.22-.53.44-1.06.64-1.59,1.67-4.12,3.09-8.37,4.25-12.72,1.11-4.14,1.98-8.36,2.59-12.67.76-5.22,1.15-10.55,1.15-15.97,0-4.08-.22-8.1-.65-12.06-5.09-.15-9.17-4.32-9.17-9.42Z"/></g>
-          <g><path class="cls-1" d="M141.35,56.5c-1.68.83-2.91,2.42-3.25,4.32-.07.34-.1.7-.1,1.06,0,.9.2,1.75.56,2.51.95,2.07,3.05,3.51,5.48,3.51s4.52-1.43,5.47-3.5c.33-.67.52-1.41.55-2.2.02-.1.02-.21.02-.32,0-.35-.03-.69-.09-1.02-.38-2.2-1.95-3.98-4.02-4.67-.61-.21-1.25-.32-1.93-.32-.2,0-.4.01-.6.03-.74.07-1.45.28-2.09.6Z"/><path class="cls-1" d="M153.49,62.2c-.17,5.05-4.34,9.12-9.45,9.12s-9.46-4.24-9.46-9.44c0-4.27,2.86-7.89,6.78-9.04.67-.2,1.36-.33,2.08-.37v-19.41h-41.56v71.22h41.51v43h41.51V62.2h-31.41Z"/></g>
-          <g><path class="cls-2" d="M60.68,140.17c-.27-.04-.54-.06-.82-.06-3.33,0-6.04,2.7-6.04,6.01s2.71,6.02,6.04,6.02,5.82-2.48,6.02-5.62c.02-.13.02-.26.02-.4,0-3.03-2.28-5.56-5.22-5.95Z"/><path class="cls-2" d="M101.45,104.4v-42.08h-40.71l-.06,74.41c4.84.41,8.64,4.46,8.64,9.39,0,.14,0,.27,0,.4h73.65v-42.12h-41.51Z"/></g>
-          <path class="cls-1" d="M358.19,115.91l9.81,8.45c-3.54,4.25-7.09,8.5-10.61,12.76-8.83-7.8-20.38-12.65-33.04-12.93v-9.82c4.55-.68,8.06-4.61,8.06-9.34s-3.51-8.65-8.06-9.32v-31.93c19.27.22,37.38,5.25,53.15,13.95l-19.31,38.18Z"/>
-          <g><path class="cls-1" d="M227.02,98.36c-.12,0-.24,0-.36.02-3.16.18-5.68,2.8-5.68,5.99,0,1.68.69,3.2,1.81,4.28,1.09,1.09,2.58,1.74,4.23,1.74,3.33,0,6.04-2.7,6.04-6.02s-2.71-6.01-6.04-6.01Z"/><path class="cls-1" d="M226.66,94.95v-32.63l-42.04.2v83.64l35.73-35.11c-1.72-1.71-2.79-4.07-2.79-6.68,0-5.08,4.06-9.24,9.1-9.42Z"/></g>
-          <g><path class="cls-1" d="M407.16,240.39c0,2.49.97,4.76,2.56,6.45-4.39,5.28-9.25,10.16-14.54,14.56l-39.24-46.07c6.21-5.1,11.22-11.61,14.49-19.05l56.19,22.84c-1.84,4.34-3.95,8.54-6.31,12.59-1.14-.48-2.38-.75-3.69-.75-5.22,0-9.46,4.23-9.46,9.43Z"/></g>
-        </g>
+    <section id="kp-map" class="map">
+      <svg viewBox="0 0 940 600" aria-label="Planta de la catedral">
+        <path class="outline" d="M10 60h90v-40h95v40h90v-40h95v40h90v-40h110M10 60v500h90v-70h95v70h90v-70h95v70h90v-70h110M520 60h100c130 0 240 110 240 240s-110 240-240 240h-100"/>
+        <path class="outline" d="M110 120h400M110 250h400M110 360h400M110 500h400M610 120c95 0 170 80 170 180s-75 180-170 180"/>
+        <path class="room-target" data-room="sala-1" d="M110 120h110v130H110z"/>
+        <path class="room-target" data-room="sala-2" d="M220 120h135v130H220z"/>
+        <path class="room-target" data-room="sala-3" d="M355 120h155v130H355z"/>
+        <path class="room-target" data-room="sala-4" d="M110 360h145v140H110z"/>
+        <path class="room-target" data-room="sala-5" d="M255 360h165v140H255z"/>
+        <path class="room-target" data-room="sala-6" d="M420 360h90v140H420z"/>
+        <path class="room-target" data-room="sala-7" d="M610 135c85 0 155 73 155 165s-70 165-155 165v-330z"/>
+        <path class="room-target" data-room="sala-8" d="M610 465c95-6 170-60 210-144 10 94-24 184-97 234z"/>
+
+        <circle class="marker" data-room="sala-1" cx="110" cy="250" r="9"/>
+        <circle class="marker" data-room="sala-2" cx="355" cy="120" r="9"/>
+        <circle class="marker" data-room="sala-3" cx="510" cy="185" r="9"/>
+        <circle class="marker" data-room="sala-4" cx="255" cy="430" r="9"/>
+        <circle class="marker" data-room="sala-5" cx="420" cy="430" r="9"/>
+        <circle class="marker" data-room="sala-6" cx="510" cy="430" r="9"/>
+        <circle class="marker" data-room="sala-7" cx="765" cy="300" r="9"/>
+        <circle class="marker" data-room="sala-8" cx="710" cy="510" r="9"/>
       </svg>
-      <aside class="kp-tag" id="kp-tag" aria-live="polite"></aside>
+      <aside id="kp-tag" class="tag" aria-live="polite"></aside>
     </section>
   </div>
 
   <script>
     (() => {
-      const rooms = [
-        {id:'sala-1',nombre:'Orígenes',m2:310,obras:12,selector:'#Capa_1-2 > g:nth-child(5) path:nth-child(2)'},
-        {id:'sala-2',nombre:'Vías sacras',m2:350,obras:11,selector:'#Capa_1-2 > g:nth-child(4) path:nth-child(2)'},
-        {id:'sala-3',nombre:'Los Mora',m2:145,obras:7,selector:'#Capa_1-2 > g:nth-child(7) path:nth-child(2)'},
-        {id:'sala-4',nombre:'Barroco',m2:145,obras:7,selector:'#Capa_1-2 > g:nth-child(2) path:nth-child(1)'},
-        {id:'sala-5',nombre:'Resurgir',m2:340,obras:18,selector:'#Capa_1-2 > g:nth-child(1) path:nth-child(2)'},
-        {id:'sala-6',nombre:'Influencias',m2:120,obras:7,selector:'#Capa_1-2 > g:nth-child(3) path:nth-child(1)'},
-        {id:'sala-7',nombre:'Miscelánea',m2:140,obras:68,selector:'#Capa_1-2 > path:nth-child(6)'},
-        {id:'sala-8',nombre:'Altar itinerante',m2:770,obras:13,selector:'#Capa_1-2 > g:nth-child(8) path:nth-child(1)'}
+      const rooms=[
+        {id:'sala-1',nombre:'Orígenes',m2:310,obras:12},
+        {id:'sala-2',nombre:'Vías sacras',m2:350,obras:11},
+        {id:'sala-3',nombre:'Los Mora',m2:145,obras:7},
+        {id:'sala-4',nombre:'Barroco',m2:145,obras:7},
+        {id:'sala-5',nombre:'Resurgir',m2:340,obras:18},
+        {id:'sala-6',nombre:'Influencias',m2:120,obras:7},
+        {id:'sala-7',nombre:'Miscelánea',m2:140,obras:68},
+        {id:'sala-8',nombre:'Altar itinerante',m2:770,obras:13}
       ];
 
-      const list = document.getElementById('kp-list');
-      const map = document.getElementById('kp-map');
-      const svg = map.querySelector('svg');
-      const tag = document.getElementById('kp-tag');
-      const listById = {};
-      const roomPathById = {};
+      const list=document.getElementById('kp-list');
+      const map=document.getElementById('kp-map');
+      const svg=map.querySelector('svg');
+      const tag=document.getElementById('kp-tag');
+      const roomEls=[...svg.querySelectorAll('.room-target')];
+      const markerEls=[...svg.querySelectorAll('.marker')];
+      const byId=Object.fromEntries(rooms.map(r=>[r.id,r]));
+      const itemById={};
 
-      rooms.forEach((r, i) => {
-        const li = document.createElement('li');
-        li.className = 'kp-item';
-        li.dataset.room = r.id;
-        li.innerHTML = `<span class="kp-num">${i+1}</span><span class="kp-name">${r.nombre}</span>`;
-        list.appendChild(li);
-        listById[r.id] = li;
-
-        const p = svg.querySelector(r.selector);
-        if (p) {
-          p.dataset.room = r.id;
-          p.classList.add('room-target');
-          roomPathById[r.id] = p;
-        }
+      rooms.forEach((r,i)=>{
+        const li=document.createElement('li');
+        li.className='item'; li.dataset.room=r.id;
+        li.innerHTML=`<span class='num'>${i+1}</span><span class='name'>${r.nombre}</span>`;
+        list.appendChild(li); itemById[r.id]=li;
       });
 
-      const maxM2 = Math.max(...rooms.map(r => r.m2), 1);
-      const maxOb = Math.max(...rooms.map(r => r.obras), 1);
+      const maxM2=Math.max(...rooms.map(r=>r.m2));
+      const maxOb=Math.max(...rooms.map(r=>r.obras));
 
-      const setActive = (id) => {
-        svg.classList.toggle('has-focus', !!id);
-        Object.values(listById).forEach(el => el.classList.toggle('is-active', el.dataset.room === id));
-        Object.values(roomPathById).forEach(el => el.classList.toggle('is-active', el.dataset.room === id));
-      };
-
-      function wheel(value, max, label) {
-        const c = Math.PI * 2 * 18;
-        const p = Math.max(0, Math.min(1, value / max));
-        return `<div class="kp-metric"><div class="kp-wheel" data-pct="${p}" data-c="${c}"><svg viewBox="0 0 46 46"><circle class="bg" cx="23" cy="23" r="18"></circle><circle class="fg" cx="23" cy="23" r="18"></circle></svg><b>${value}</b></div><div class="kp-meta"><strong>${label}</strong></div></div>`;
+      function setActive(id){
+        svg.classList.toggle('has-focus',!!id);
+        Object.values(itemById).forEach(el=>el.classList.toggle('is-active',el.dataset.room===id));
+        roomEls.forEach(el=>el.classList.toggle('is-active',el.dataset.room===id));
+        markerEls.forEach(el=>el.classList.toggle('active',el.dataset.room===id));
       }
 
-      function placeTagNear(x, y) {
-        const box = map.getBoundingClientRect();
-        const centerX = box.width * 0.5;
-        const centerY = box.height * 0.5;
-
-        let left = x + 14;
-        let top = y - 10;
-        let side = 'right';
-
-        if (x > centerX && x > 180) { left = x - 250; side = 'left'; }
-        if (y < 72) { top = y + 18; side = 'bottom'; }
-        if (y > box.height - 90) { top = y - 118; side = 'top'; }
-
-        left = Math.min(Math.max(8, left), box.width - 260);
-        top = Math.min(Math.max(8, top), box.height - 128);
-
-        tag.dataset.side = side;
-        tag.style.left = `${left}px`;
-        tag.style.top = `${top}px`;
+      function wheel(v,max,label){
+        const c=Math.PI*2*18,p=Math.max(0,Math.min(1,v/max));
+        return `<div class='metric'><div class='wheel' data-p='${p}' data-c='${c}'><svg viewBox='0 0 46 46'><circle class='bg' cx='23' cy='23' r='18'/><circle class='fg' cx='23' cy='23' r='18'/></svg><b>${v}</b></div><div class='meta'><strong>${label}</strong></div></div>`;
       }
 
-      function showTag(id, ev) {
-        const d = rooms.find(r => r.id === id);
-        if (!d) return;
-
-        tag.innerHTML = `<h4>${d.nombre}</h4><div class="kp-metrics">${wheel(d.m2, maxM2, 'm²')}${wheel(d.obras, maxOb, 'obras')}</div>`;
-        tag.classList.add('is-open');
-
-        const mapBox = map.getBoundingClientRect();
-        let x = mapBox.width * .48;
-        let y = mapBox.height * .42;
-
-        if (ev && typeof ev.clientX === 'number') {
-          x = ev.clientX - mapBox.left;
-          y = ev.clientY - mapBox.top;
-        } else if (roomPathById[id]) {
-          const b = roomPathById[id].getBBox();
-          x = (b.x + b.width * .52) * (mapBox.width / svg.viewBox.baseVal.width);
-          y = (b.y + b.height * .5) * (mapBox.height / svg.viewBox.baseVal.height);
-        }
-
-        placeTagNear(x, y);
-
-        requestAnimationFrame(() => {
-          tag.querySelectorAll('.kp-wheel').forEach(w => {
-            const fg = w.querySelector('.fg');
-            fg.style.strokeDasharray = `${(+w.dataset.pct * +w.dataset.c).toFixed(1)} ${(+w.dataset.c).toFixed(1)}`;
-          });
-        });
+      function placeTag(x,y){
+        const b=map.getBoundingClientRect();
+        let left=x+14, top=y-12, side='right';
+        if(x>b.width*.56){left=x-258;side='left';}
+        left=Math.max(8,Math.min(left,b.width-280));
+        top=Math.max(8,Math.min(top,b.height-120));
+        tag.dataset.side=side; tag.style.left=`${left}px`; tag.style.top=`${top}px`;
       }
 
-      Object.values(listById).forEach(el => {
-        const id = el.dataset.room;
-        el.addEventListener('mouseenter', () => setActive(id));
-        el.addEventListener('mouseleave', () => setActive(null));
-        el.addEventListener('click', () => { setActive(id); showTag(id); });
+      function showTag(id,ev){
+        const d=byId[id]; if(!d) return;
+        tag.innerHTML=`<h4>${d.nombre}</h4><div class='metrics'>${wheel(d.m2,maxM2,'m²')}${wheel(d.obras,maxOb,'obras')}</div>`;
+        tag.classList.add('open');
+        const box=map.getBoundingClientRect();
+        let x=box.width*.5,y=box.height*.45;
+        if(ev?.clientX){x=ev.clientX-box.left;y=ev.clientY-box.top}
+        else { const el=svg.querySelector(`.room-target[data-room='${id}']`); const bb=el.getBBox(); x=(bb.x+bb.width*.5)*(box.width/svg.viewBox.baseVal.width); y=(bb.y+bb.height*.5)*(box.height/svg.viewBox.baseVal.height); }
+        placeTag(x,y);
+        requestAnimationFrame(()=>tag.querySelectorAll('.wheel').forEach(w=>{w.querySelector('.fg').style.strokeDasharray=`${(+w.dataset.p*+w.dataset.c).toFixed(1)} ${(+w.dataset.c).toFixed(1)}`;}));
+      }
+
+      [...Object.values(itemById),...roomEls,...markerEls].forEach(el=>{
+        const id=el.dataset.room;
+        el.addEventListener('mouseenter',()=>setActive(id));
+        el.addEventListener('mouseleave',()=>setActive(null));
+        el.addEventListener('click',e=>{setActive(id);showTag(id,e);});
       });
 
-      Object.values(roomPathById).forEach(el => {
-        const id = el.dataset.room;
-        el.addEventListener('mouseenter', () => setActive(id));
-        el.addEventListener('mouseleave', () => setActive(null));
-        el.addEventListener('click', (e) => { setActive(id); showTag(id, e); });
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!map.contains(e.target) && !list.contains(e.target)) {
-          tag.classList.remove('is-open');
-          setActive(null);
-        }
-      });
-
-      window.addEventListener('resize', () => {
-        if (tag.classList.contains('is-open')) {
-          const active = svg.querySelector('.room-target.is-active');
-          if (active) {
-            const mapBox = map.getBoundingClientRect();
-            const b = active.getBBox();
-            const x = (b.x + b.width * .52) * (mapBox.width / svg.viewBox.baseVal.width);
-            const y = (b.y + b.height * .5) * (mapBox.height / svg.viewBox.baseVal.height);
-            placeTagNear(x, y);
-          }
-        }
-      });
+      document.addEventListener('click',e=>{ if(!map.contains(e.target)&&!list.contains(e.target)){tag.classList.remove('open');setActive(null);} });
     })();
   </script>
 </div>
