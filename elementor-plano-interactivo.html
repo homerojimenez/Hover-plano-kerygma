@@ -1,0 +1,76 @@
+<div id="kp-plano" class="kp-wrap" aria-label="Plano interactivo de salas">
+  <style>
+    #kp-plano{--bg:#000;--txt:#d7d7d7;--line:#f2f2f2;--room:#cfcfd1;--hot:#eb568a;--tag:#111;--tag-border:#2a2a2a;font-family:Inter,Montserrat,Arial,sans-serif;background:var(--bg);color:var(--txt);padding:clamp(12px,2vw,24px)}
+    #kp-plano *{box-sizing:border-box} #kp-plano .kp-grid{display:grid;grid-template-columns:minmax(280px,520px) 1fr;gap:clamp(20px,3vw,40px)}
+    #kp-plano .kp-title{font-size:clamp(28px,4vw,52px);letter-spacing:.08em;text-transform:uppercase;color:var(--hot);margin:0 0 16px;font-weight:800}
+    #kp-plano .kp-desc{font-size:clamp(15px,1.2vw,21px);line-height:1.35;color:#b7b7b7;max-width:50ch;margin:0 0 28px}
+    #kp-plano .kp-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:12px 20px}
+    #kp-plano .kp-item{display:flex;align-items:center;gap:12px;cursor:pointer}.kp-num{display:grid;place-items:center;width:28px;height:28px;border:2px solid #dfdfdf;border-radius:50%;font-size:12px;font-weight:700;color:#efefef;flex:0 0 28px}
+    #kp-plano .kp-name{font-size:clamp(16px,1.5vw,38px);font-weight:700;line-height:1.1}
+    #kp-plano .kp-item.is-active .kp-num,#kp-plano .kp-item:hover .kp-num{border-color:var(--hot);color:var(--hot)}
+    #kp-plano .kp-item.is-active .kp-name,#kp-plano .kp-item:hover .kp-name{color:#fff;text-shadow:0 0 9px rgba(235,86,138,.35)}
+    #kp-plano .kp-item.is-active .kp-name::after{content:'  👁';font-size:.75em;color:var(--hot)}
+    #kp-plano .kp-map{position:relative} #kp-plano svg{width:100%;height:auto;display:block}
+    #kp-plano .room-target{fill:var(--room)!important;stroke:#ececec;stroke-width:1.2;cursor:pointer;transition:.2s}
+    #kp-plano svg.has-focus .room-target{opacity:.35;filter:grayscale(.3)}
+    #kp-plano .room-target.is-active,#kp-plano .room-target:hover{fill:var(--hot)!important;opacity:1!important;filter:none!important}
+    #kp-plano .kp-tag{position:absolute;min-width:220px;padding:10px 12px;background:rgba(17,17,17,.95);border:1px solid var(--tag-border);border-radius:10px;display:none;z-index:5}
+    #kp-plano .kp-tag.is-open{display:block}.kp-tag:after{content:'';position:absolute;left:16px;bottom:-8px;width:14px;height:14px;background:inherit;border-left:1px solid var(--tag-border);border-bottom:1px solid var(--tag-border);transform:rotate(-45deg)}
+    #kp-plano .kp-tag h4{margin:0 0 8px;font-size:13px;color:#fff}.kp-metrics{display:flex;gap:10px}.kp-wheel{--size:54px;position:relative;width:var(--size);height:var(--size)}
+    .kp-wheel svg{transform:rotate(-90deg)}.kp-wheel .bg{fill:none;stroke:#2f2f2f;stroke-width:7}.kp-wheel .fg{fill:none;stroke:var(--hot);stroke-linecap:round;stroke-width:7;stroke-dasharray:0 999;transition:stroke-dasharray 1s cubic-bezier(.2,.7,0,1)}
+    .kp-wheel b{position:absolute;inset:0;display:grid;place-items:center;font-size:11px;color:#fff}.kp-meta{font-size:12px;color:#d8d8d8}
+    @media (max-width:980px){#kp-plano .kp-grid{grid-template-columns:1fr}#kp-plano .kp-list{grid-template-columns:1fr}}
+  </style>
+  <div class="kp-grid">
+    <section>
+      <h2 class="kp-title">PLANTA</h2>
+      <p class="kp-desc">Hover cruzado entre lista y plano, click para abrir bocadillo con métricas.</p>
+      <ol class="kp-list" id="kp-list"></ol>
+    </section>
+    <section class="kp-map" id="kp-map">
+      <!-- SVG real recibido. Mantén este bloque tal cual. -->
+      <svg id="Capa_2" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470.06 351">
+        <defs><style>.cls-1{fill:#eaeaea}.cls-2{fill:#eb568a}.cls-3{fill:#c7c6c6}</style></defs>
+        <g id="Capa_1-2" data-name="Capa 1">
+          <g><path class="cls-1" d="M329.46,245.41c0-2.86-2.01-5.26-4.7-5.87-.43-.1-.88-.15-1.34-.15-3.33,0-6.04,2.7-6.04,6.02s2.71,6.01,6.04,6.01c.46,0,.91-.05,1.34-.15,2.69-.61,4.7-3.01,4.7-5.86Z"/><path class="cls-1" d="M355.88,215.92c-8.54,6.92-19.35,11.16-31.12,11.54v8.61c4.59.64,8.12,4.58,8.12,9.34s-3.53,8.69-8.12,9.33v32.27c26.53-.38,50.83-9.94,69.81-25.66l-38.69-45.43Z"/></g>
+          <g><path class="cls-1" d="M216.76,245.41c0-2.6,1.05-4.95,2.75-6.65l-34.69-34.55H60.23l-1.62,84.24h168.17v-33.63c-.19.01-.37.02-.56.02-5.22,0-9.46-4.23-9.46-9.43Z"/><path class="cls-1" d="M226.22,239.39c-1.67,0-3.19.68-4.28,1.78-1.09,1.08-1.76,2.58-1.76,4.24,0,3.31,2.7,6.01,6.04,6.01.19,0,.37-.01.56-.03,3.07-.28,5.48-2.86,5.48-5.98,0-3.32-2.71-6.02-6.04-6.02Z"/></g>
+          <g><path class="cls-1" d="M425.2,154.15c0-3.87,2.34-7.2,5.68-8.65-5.08-18.06-14.63-34.28-27.39-47.38-3.07-3.15-6.32-6.12-9.74-8.89h0c-3.79-3.09-7.79-5.92-11.97-8.49-1.36-.83-2.73-1.63-4.12-2.41l-1.92,3.79-17.03,33.68,9.56,8.24.32.27-.27.33c-3.46,4.13-6.92,8.29-10.35,12.44,10.58,9.51,17.24,23.25,17.24,38.54,0,7.26-1.51,14.16-4.21,20.44l53.79,21.87,1.6.65c.22-.53.44-1.06.64-1.59,1.67-4.12,3.09-8.37,4.25-12.72,1.11-4.14,1.98-8.36,2.59-12.67.76-5.22,1.15-10.55,1.15-15.97,0-4.08-.22-8.1-.65-12.06-5.09-.15-9.17-4.32-9.17-9.42Z"/></g>
+          <g><path class="cls-1" d="M141.35,56.5c-1.68.83-2.91,2.42-3.25,4.32-.07.34-.1.7-.1,1.06,0,.9.2,1.75.56,2.51.95,2.07,3.05,3.51,5.48,3.51s4.52-1.43,5.47-3.5c.33-.67.52-1.41.55-2.2.02-.1.02-.21.02-.32,0-.35-.03-.69-.09-1.02-.38-2.2-1.95-3.98-4.02-4.67-.61-.21-1.25-.32-1.93-.32-.2,0-.4.01-.6.03-.74.07-1.45.28-2.09.6Z"/><path class="cls-1" d="M153.49,62.2c-.17,5.05-4.34,9.12-9.45,9.12s-9.46-4.24-9.46-9.44c0-4.27,2.86-7.89,6.78-9.04.67-.2,1.36-.33,2.08-.37v-19.41h-41.56v71.22h41.51v43h41.51V62.2h-31.41Z"/></g>
+          <g><path class="cls-2" d="M60.68,140.17c-.27-.04-.54-.06-.82-.06-3.33,0-6.04,2.7-6.04,6.01s2.71,6.02,6.04,6.02,5.82-2.48,6.02-5.62c.02-.13.02-.26.02-.4,0-3.03-2.28-5.56-5.22-5.95Z"/><path class="cls-2" d="M101.45,104.4v-42.08h-40.71l-.06,74.41c4.84.41,8.64,4.46,8.64,9.39,0,.14,0,.27,0,.4h73.65v-42.12h-41.51Z"/></g>
+          <path class="cls-1" d="M358.19,115.91l9.81,8.45c-3.54,4.25-7.09,8.5-10.61,12.76-8.83-7.8-20.38-12.65-33.04-12.93v-9.82c4.55-.68,8.06-4.61,8.06-9.34s-3.51-8.65-8.06-9.32v-31.93c19.27.22,37.38,5.25,53.15,13.95l-19.31,38.18Z"/>
+          <g><path class="cls-1" d="M227.02,98.36c-.12,0-.24,0-.36.02-3.16.18-5.68,2.8-5.68,5.99,0,1.68.69,3.2,1.81,4.28,1.09,1.09,2.58,1.74,4.23,1.74,3.33,0,6.04-2.7,6.04-6.02s-2.71-6.01-6.04-6.01Z"/><path class="cls-1" d="M226.66,94.95v-32.63l-42.04.2v83.64l35.73-35.11c-1.72-1.71-2.79-4.07-2.79-6.68,0-5.08,4.06-9.24,9.1-9.42Z"/></g>
+          <g><path class="cls-1" d="M407.16,240.39c0,2.49.97,4.76,2.56,6.45-4.39,5.28-9.25,10.16-14.54,14.56l-39.24-46.07c6.21-5.1,11.22-11.61,14.49-19.05l56.19,22.84c-1.84,4.34-3.95,8.54-6.31,12.59-1.14-.48-2.38-.75-3.69-.75-5.22,0-9.46,4.23-9.46,9.43Z"/></g>
+        </g>
+      </svg>
+      <aside class="kp-tag" id="kp-tag" aria-live="polite"></aside>
+    </section>
+  </div>
+  <script>
+  (()=>{
+    const rooms=[
+      {id:'sala-1',nombre:'Orígenes',m2:310,obras:12,selector:'#Capa_1-2 > g:nth-child(5) path:nth-child(2)'},
+      {id:'sala-2',nombre:'Vías sacras',m2:350,obras:11,selector:'#Capa_1-2 > g:nth-child(4) path:nth-child(2)'},
+      {id:'sala-3',nombre:'Los Mora',m2:145,obras:7,selector:'#Capa_1-2 > g:nth-child(7) path:nth-child(2)'},
+      {id:'sala-4',nombre:'Barroco',m2:145,obras:7,selector:'#Capa_1-2 > g:nth-child(2) path:nth-child(1)'},
+      {id:'sala-5',nombre:'Resurgir',m2:340,obras:18,selector:'#Capa_1-2 > g:nth-child(1) path:nth-child(2)'},
+      {id:'sala-6',nombre:'Influencias',m2:120,obras:7,selector:'#Capa_1-2 > g:nth-child(3) path:nth-child(1)'},
+      {id:'sala-7',nombre:'Miscelánea',m2:140,obras:68,selector:'#Capa_1-2 > path:nth-child(6)'},
+      {id:'sala-8',nombre:'Altar itinerante',m2:770,obras:13,selector:'#Capa_1-2 > g:nth-child(8) path:nth-child(1)'}
+    ];
+    const list=document.getElementById('kp-list'); const map=document.getElementById('kp-map'); const svg=map.querySelector('svg'); const tag=document.getElementById('kp-tag');
+    const listById={}; const roomPathById={};
+    rooms.forEach((r,i)=>{const li=document.createElement('li');li.className='kp-item';li.dataset.room=r.id;li.innerHTML=`<span class="kp-num">${i+1}</span><span class="kp-name">${r.nombre}</span>`;list.appendChild(li);listById[r.id]=li; const p=svg.querySelector(r.selector); if(p){p.dataset.room=r.id;p.classList.add('room-target');roomPathById[r.id]=p;}});
+    const maxM2=Math.max(...rooms.map(r=>r.m2),1),maxOb=Math.max(...rooms.map(r=>r.obras),1);
+    const setActive=id=>{svg.classList.toggle('has-focus',!!id);Object.values(listById).forEach(e=>e.classList.toggle('is-active',e.dataset.room===id));Object.values(roomPathById).forEach(e=>e.classList.toggle('is-active',e.dataset.room===id));};
+    const wheel=(v,max,l)=>{const c=Math.PI*2*18,p=Math.max(0,Math.min(1,v/max));return `<div class="kp-wheel" data-pct="${p}" data-c="${c}"><svg viewBox="0 0 46 46"><circle class="bg" cx="23" cy="23" r="18"></circle><circle class="fg" cx="23" cy="23" r="18"></circle></svg><b>${v}</b></div><div class="kp-meta"><strong>${l}</strong></div>`};
+    function showTag(id,ev){const d=rooms.find(r=>r.id===id); if(!d) return; tag.innerHTML=`<h4>${d.nombre}</h4><div class='kp-metrics'>${wheel(d.m2,maxM2,'m²')}${wheel(d.obras,maxOb,'obras')}</div>`; tag.classList.add('is-open');
+      const b=map.getBoundingClientRect(); const r=(roomPathById[id]&&roomPathById[id].getBBox)?roomPathById[id].getBBox():{x:120,y:80,width:60,height:60};
+      const x=ev?.clientX?ev.clientX-b.left:(r.x+r.width*.55)*(b.width/svg.viewBox.baseVal.width), y=ev?.clientY?ev.clientY-b.top:(r.y+r.height*.5)*(b.height/svg.viewBox.baseVal.height);
+      tag.style.left=`${Math.min(Math.max(8,x+12),b.width-232)}px`; tag.style.top=`${Math.min(Math.max(8,y-10),b.height-120)}px`;
+      requestAnimationFrame(()=>tag.querySelectorAll('.kp-wheel').forEach(w=>{const fg=w.querySelector('.fg');fg.style.strokeDasharray=`${(+w.dataset.pct*+w.dataset.c).toFixed(1)} ${(+w.dataset.c).toFixed(1)}`;})); }
+    Object.values(listById).forEach(el=>{const id=el.dataset.room;el.onmouseenter=()=>setActive(id);el.onmouseleave=()=>setActive(null);el.onclick=()=>{setActive(id);showTag(id);};});
+    Object.values(roomPathById).forEach(el=>{const id=el.dataset.room;el.onmouseenter=()=>setActive(id);el.onmouseleave=()=>setActive(null);el.onclick=e=>{setActive(id);showTag(id,e);};});
+    document.addEventListener('click',e=>{if(!map.contains(e.target)&&!list.contains(e.target)){tag.classList.remove('is-open');setActive(null);}});
+  })();
+  </script>
+</div>
